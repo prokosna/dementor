@@ -1,0 +1,3 @@
+# test.job
+type=command
+command=echo "Hello Test"

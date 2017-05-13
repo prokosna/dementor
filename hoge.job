@@ -1,3 +1,0 @@
-# hoge.job
-type=command
-command=echo "hello world"

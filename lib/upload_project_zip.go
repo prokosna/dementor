@@ -1,27 +1,43 @@
 package dementor
 
 import (
-	"net/url"
-	"github.com/franela/goreq"
 	"bytes"
-	"mime/multipart"
-	"os"
-	"path"
-	"net/textproto"
 	"fmt"
 	"io"
+	"mime/multipart"
+	"net/textproto"
+	"net/url"
+	"os"
+	"path"
 	"strings"
+
+	"io/ioutil"
+
+	"github.com/franela/goreq"
+	"github.com/tidwall/gjson"
 )
 
-// Create project.
-func UploadProjectZip(uri string, sessionId string, project string, filePath string) error {
-	u, err := url.Parse(uri)
+type UploadProjectZipReq struct {
+	Project  string
+	FilePath string
+	CommonConf
+}
+
+type UploadProjectZipRes struct {
+	Error     string `json:"error"`
+	ProjectId string `json:"projectId"`
+	Version   string `json:"version"`
+}
+
+// Upload a project zip file
+func UploadProjectZip(sessionId string, uq *UploadProjectZipReq) (*UploadProjectZipRes, error) {
+	u, err := url.Parse(uq.HTTP.Url)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// prepare a from with zip file
-	fileName := path.Base(filePath)
+	fileName := path.Base(uq.FilePath)
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 	part := make(textproto.MIMEHeader)
@@ -29,15 +45,15 @@ func UploadProjectZip(uri string, sessionId string, project string, filePath str
 	part.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, fileName))
 	pw, err := w.CreatePart(part)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	f, err := os.Open(filePath)
+	f, err := os.Open(uq.FilePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer f.Close()
 	if _, err = io.Copy(pw, f); err != nil {
-		return err
+		return nil, err
 	}
 
 	// add another field
@@ -46,37 +62,50 @@ func UploadProjectZip(uri string, sessionId string, project string, filePath str
 	part.Set("Content-Disposition", `form-data; name="session.id"`)
 	pw, err = w.CreatePart(part)
 	if _, err = pw.Write([]byte(sessionId)); err != nil {
-		return err
+		return nil, err
 	}
 	part = make(textproto.MIMEHeader)
 	part.Set("Content-Type", "text/plain")
 	part.Set("Content-Disposition", `form-data; name="ajax"`)
 	pw, err = w.CreatePart(part)
 	if _, err = pw.Write([]byte("upload")); err != nil {
-		return err
+		return nil, err
 	}
 	part = make(textproto.MIMEHeader)
 	part.Set("Content-Type", "text/plain")
 	part.Set("Content-Disposition", `form-data; name="project"`)
 	pw, err = w.CreatePart(part)
-	if _, err = pw.Write([]byte(project)); err != nil {
-		return err
+	if _, err = pw.Write([]byte(uq.Project)); err != nil {
+		return nil, err
 	}
-
 	w.Close()
-
 	u.Path = strings.Trim(u.Path, "/") + "/manager"
 
 	res, err := goreq.Request{
-		Method: "POST",
-		Uri: u.String(),
-		Body: &b,
+		Method:      "POST",
+		Uri:         u.String(),
+		Body:        &b,
 		ContentType: w.FormDataContentType(),
+		Insecure:    uq.HTTP.Insecure,
 	}.Do()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() {
+		io.Copy(ioutil.Discard, res.Body)
+		res.Body.Close()
+	}()
+	body, _ := res.Body.ToString()
 
-	return nil
+	// parse body
+	var us UploadProjectZipRes
+	err = gjson.Unmarshal([]byte(body), &us)
+	if err != nil {
+		return nil, err
+	}
+	if us.Error != "" {
+		return nil, fmt.Errorf("ERROR: %+v", us)
+	}
+
+	return &us, nil
 }

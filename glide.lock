@@ -1,0 +1,20 @@
+hash: 8b89a9b804c9e599433bebd2e1991e84f76cbdc81ac3a3a648fc6b77dc97180c
+updated: 2017-05-13T15:21:40.733413796+09:00
+imports:
+- name: github.com/antonholmquist/jason
+  version: c23cef7eaa75a6a5b8810120e167bd590d8fd2ab
+- name: github.com/BurntSushi/toml
+  version: b26d9c308763d68093482582cea63d69be07a0f0
+- name: github.com/franela/goreq
+  version: b5b0f5eb2d16f20345cce0a544a75163579c0b00
+- name: github.com/jinzhu/configor
+  version: b7df2005e02e9226447139012db968eda90a4b91
+- name: github.com/kelseyhightower/envconfig
+  version: f611eb38b3875cc3bd991ca91c51d06446afa14c
+- name: github.com/tidwall/gjson
+  version: 0623bd8fbdbf97cc62b98d15108832851a658e59
+- name: github.com/tidwall/match
+  version: 173748da739a410c5b0b813b956f89ff94730b4c
+- name: gopkg.in/yaml.v1
+  version: 9f9df34309c04878acc86042b16630b0f696e1de
+testImports: []

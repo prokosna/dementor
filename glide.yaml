@@ -1,0 +1,8 @@
+package: github.com/prokosna/dementor
+import:
+- package: github.com/antonholmquist/jason
+- package: github.com/franela/goreq
+- package: github.com/jinzhu/configor
+- package: github.com/tidwall/gjson
+- package: github.com/kelseyhightower/envconfig
+  version: ^1.3.0
