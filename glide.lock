@@ -1,26 +1,20 @@
-hash: a92eea632d5e0143ef0cedd399fd9138e49b24efa31257ccf7c72017bd7ee855
-updated: 2017-05-15T00:57:14.79218971+09:00
+hash: e48fffe1e2310788335236a86046eda94e0faa26c80ab3b3321556ad8b03e275
+updated: 2017-05-15T03:15:52.540326246+09:00
 imports:
-- name: github.com/antonholmquist/jason
-  version: c23cef7eaa75a6a5b8810120e167bd590d8fd2ab
 - name: github.com/armon/go-radix
   version: 4239b77079c7b5d1243b7b4736304ce8ddb6f0f2
 - name: github.com/bgentry/speakeasy
   version: 675b82c74c0ed12283ee81ba8a534c8982c07b85
-- name: github.com/davecgh/go-spew
-  version: 346938d642f2ec3594ed81d874461961cd0faa76
-  subpackages:
-  - spew
 - name: github.com/franela/goreq
   version: b5b0f5eb2d16f20345cce0a544a75163579c0b00
 - name: github.com/jessevdk/go-flags
   version: 48cf8722c3375517aba351d1f7577c40663a4407
-- name: github.com/jinzhu/configor
-  version: b7df2005e02e9226447139012db968eda90a4b91
 - name: github.com/k0kubun/pp
   version: 027a6d1765d673d337e687394dbe780dd64e2a1e
 - name: github.com/kelseyhightower/envconfig
   version: f611eb38b3875cc3bd991ca91c51d06446afa14c
+- name: github.com/mattn/go-colorable
+  version: ded68f7a9561c023e790de24279db7ebf473ea80
 - name: github.com/mattn/go-isatty
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/mitchellh/cli
@@ -33,4 +27,6 @@ imports:
   version: 99f16d856c9836c42d24e7ab64ea72916925fa97
   subpackages:
   - unix
+- name: gopkg.in/yaml.v2
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 testImports: []
