@@ -31,7 +31,7 @@ type UploadProjectZipRes struct {
 
 // Upload a project zip file
 func UploadProjectZip(sessionId string, uq *UploadProjectZipReq) (*UploadProjectZipRes, error) {
-	u, err := url.Parse(uq.HTTP.Url)
+	u, err := url.Parse(uq.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func UploadProjectZip(sessionId string, uq *UploadProjectZipReq) (*UploadProject
 		Uri:         u.String(),
 		Body:        &b,
 		ContentType: w.FormDataContentType(),
-		Insecure:    uq.HTTP.Insecure,
+		Insecure:    uq.Insecure,
 	}.Do()
 	if err != nil {
 		return nil, err
@@ -96,6 +96,11 @@ func UploadProjectZip(sessionId string, uq *UploadProjectZipReq) (*UploadProject
 		res.Body.Close()
 	}()
 	body, _ := res.Body.ToString()
+
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
 
 	// parse body
 	var us UploadProjectZipRes

@@ -26,7 +26,7 @@ type FetchScheduleRes struct {
 
 // Fetch a schedule of flow
 func FetchSchedule(sessionId string, fq *FetchScheduleReq) (*FetchScheduleRes, error) {
-	u, err := url.Parse(fq.HTTP.Url)
+	u, err := url.Parse(fq.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func FetchSchedule(sessionId string, fq *FetchScheduleReq) (*FetchScheduleRes, e
 	res, err := goreq.Request{
 		Method:   "GET",
 		Uri:      u.String(),
-		Insecure: fq.HTTP.Insecure,
+		Insecure: fq.Insecure,
 	}.Do()
 	if err != nil {
 		return nil, err
@@ -53,10 +53,22 @@ func FetchSchedule(sessionId string, fq *FetchScheduleReq) (*FetchScheduleRes, e
 	}()
 	body, _ := res.Body.ToString()
 
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
+
 	// check error
 	if errName := gjson.Get(body, "error"); errName.Exists() {
-		errMsg := gjson.Get(body, "message")
-		return nil, fmt.Errorf("ERROR: %s\n%s", errName, errMsg)
+		return nil, fmt.Errorf("ERROR: %s", errName)
+	}
+
+	// check empty
+	v := gjson.Parse(body)
+	if !v.Exists() {
+		return nil, fmt.Errorf("ERROR: Project or flow does not exist\nProjectId -> %s\nFlowId -> %s",
+			fq.ProjectId,
+			fq.FlowId)
 	}
 
 	// parse body

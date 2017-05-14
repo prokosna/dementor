@@ -14,23 +14,27 @@ import (
 
 type ScheduleFlowReq struct {
 	ProjectName    string
-	FlowName       string
+	Flow           string
 	CronExpression string
 	CommonConf
 }
 
+type ScheduleFlowRes struct {
+	ScheduleId int64 `json:"scheduleId"`
+}
+
 // Create project.
-func ScheduleFlow(sessionId string, sq *ScheduleFlowReq) error {
-	u, err := url.Parse(sq.HTTP.Url)
+func ScheduleFlow(sessionId string, sq *ScheduleFlowReq) (*ScheduleFlowRes, error) {
+	u, err := url.Parse(sq.Url)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	q := u.Query()
 	q.Set("session.id", sessionId)
 	q.Set("ajax", "scheduleCronFlow")
 	q.Set("projectName", sq.ProjectName)
-	q.Set("flowName", sq.FlowName)
+	q.Set("flow", sq.Flow)
 	q.Set("cronExpression", sq.CronExpression)
 	u.Path = strings.Trim(u.Path, "/") + "/schedule"
 	u.RawQuery = q.Encode()
@@ -38,10 +42,10 @@ func ScheduleFlow(sessionId string, sq *ScheduleFlowReq) error {
 	res, err := goreq.Request{
 		Method:   "POST",
 		Uri:      u.String(),
-		Insecure: sq.HTTP.Insecure,
+		Insecure: sq.Insecure,
 	}.Do()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
 		io.Copy(ioutil.Discard, res.Body)
@@ -49,11 +53,21 @@ func ScheduleFlow(sessionId string, sq *ScheduleFlowReq) error {
 	}()
 	body, _ := res.Body.ToString()
 
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
+
 	// check error
 	if status := gjson.Get(body, "status"); status.Str != "success" {
 		errMsg := gjson.Get(body, "message")
-		return fmt.Errorf("ERROR: %s\n%s", status, errMsg)
+		return nil, fmt.Errorf("ERROR: %s\n%s", status, errMsg)
 	}
 
-	return nil
+	// parse body
+	sr := &ScheduleFlowRes{
+		ScheduleId: gjson.Get(body, "scheduleId").Int(),
+	}
+
+	return sr, nil
 }

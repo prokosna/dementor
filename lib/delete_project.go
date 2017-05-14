@@ -7,6 +7,8 @@ import (
 	"io"
 	"io/ioutil"
 
+	"fmt"
+
 	"github.com/franela/goreq"
 )
 
@@ -17,7 +19,7 @@ type DeleteProjectReq struct {
 
 // Delete a project
 func DeleteProject(sessionId string, dq *DeleteProjectReq) error {
-	u, err := url.Parse(dq.HTTP.Url)
+	u, err := url.Parse(dq.Url)
 	if err != nil {
 		return err
 	}
@@ -32,7 +34,7 @@ func DeleteProject(sessionId string, dq *DeleteProjectReq) error {
 	res, err := goreq.Request{
 		Method:   "GET",
 		Uri:      u.String(),
-		Insecure: dq.HTTP.Insecure,
+		Insecure: dq.Insecure,
 	}.Do()
 	if err != nil {
 		return err
@@ -41,6 +43,11 @@ func DeleteProject(sessionId string, dq *DeleteProjectReq) error {
 		io.Copy(ioutil.Discard, res.Body)
 		res.Body.Close()
 	}()
+
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
 
 	return nil
 }

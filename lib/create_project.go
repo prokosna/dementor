@@ -25,7 +25,7 @@ type CreateProjectRes struct {
 
 // Create a project
 func CreateProject(sessionId string, cq *CreateProjectReq) (*CreateProjectRes, error) {
-	u, err := url.Parse(cq.HTTP.Url)
+	u, err := url.Parse(cq.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func CreateProject(sessionId string, cq *CreateProjectReq) (*CreateProjectRes, e
 	res, err := goreq.Request{
 		Method:   "POST",
 		Uri:      u.String(),
-		Insecure: cq.HTTP.Insecure,
+		Insecure: cq.Insecure,
 	}.Do()
 	if err != nil {
 		return nil, err
@@ -51,6 +51,11 @@ func CreateProject(sessionId string, cq *CreateProjectReq) (*CreateProjectRes, e
 		res.Body.Close()
 	}()
 	body, _ := res.Body.ToString()
+
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
 
 	// check error
 	if errName := gjson.Get(body, "error"); errName.Exists() {

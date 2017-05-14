@@ -31,7 +31,7 @@ type FetchJobsFlowRes struct {
 
 // Fetch jobs of a flow
 func FetchJobsFlow(sessionId string, fq *FetchJobsFlowReq) (*FetchJobsFlowRes, error) {
-	u, err := url.Parse(fq.HTTP.Url)
+	u, err := url.Parse(fq.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func FetchJobsFlow(sessionId string, fq *FetchJobsFlowReq) (*FetchJobsFlowRes, e
 	res, err := goreq.Request{
 		Method:   "GET",
 		Uri:      u.String(),
-		Insecure: fq.HTTP.Insecure,
+		Insecure: fq.Insecure,
 	}.Do()
 	if err != nil {
 		return nil, err
@@ -58,10 +58,14 @@ func FetchJobsFlow(sessionId string, fq *FetchJobsFlowReq) (*FetchJobsFlowRes, e
 	}()
 	body, _ := res.Body.ToString()
 
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
+
 	// check error
 	if errName := gjson.Get(body, "error"); errName.Exists() {
-		errMsg := gjson.Get(body, "message")
-		return nil, fmt.Errorf("ERROR: %s\n%s", errName, errMsg)
+		return nil, fmt.Errorf("ERROR: %s", errName)
 	}
 
 	// parse body

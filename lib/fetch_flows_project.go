@@ -27,7 +27,7 @@ type FetchFlowsProjectRes struct {
 
 // Fetch flows of a project
 func FetchFlowsProject(sessionId string, fq *FetchFlowsProjectReq) (*FetchFlowsProjectRes, error) {
-	u, err := url.Parse(fq.HTTP.Url)
+	u, err := url.Parse(fq.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func FetchFlowsProject(sessionId string, fq *FetchFlowsProjectReq) (*FetchFlowsP
 	res, err := goreq.Request{
 		Method:   "GET",
 		Uri:      u.String(),
-		Insecure: fq.HTTP.Insecure,
+		Insecure: fq.Insecure,
 	}.Do()
 	if err != nil {
 		return nil, err
@@ -53,10 +53,14 @@ func FetchFlowsProject(sessionId string, fq *FetchFlowsProjectReq) (*FetchFlowsP
 	}()
 	body, _ := res.Body.ToString()
 
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
+
 	// check error
 	if errName := gjson.Get(body, "error"); errName.Exists() {
-		errMsg := gjson.Get(body, "message")
-		return nil, fmt.Errorf("ERROR: %s\n%s", errName, errMsg)
+		return nil, fmt.Errorf("ERROR: %s", errName)
 	}
 
 	// parse body

@@ -17,7 +17,7 @@ func TestLoginSuccess(t *testing.T) {
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 	conf := Config
-	conf.HTTP.Url = ts.URL
+	conf.Url = ts.URL
 
 	req := &AuthenticateReq{
 		CommonConf: conf,

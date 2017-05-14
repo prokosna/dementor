@@ -1,20 +1,36 @@
-hash: 8b89a9b804c9e599433bebd2e1991e84f76cbdc81ac3a3a648fc6b77dc97180c
-updated: 2017-05-13T15:21:40.733413796+09:00
+hash: a92eea632d5e0143ef0cedd399fd9138e49b24efa31257ccf7c72017bd7ee855
+updated: 2017-05-15T00:57:14.79218971+09:00
 imports:
 - name: github.com/antonholmquist/jason
   version: c23cef7eaa75a6a5b8810120e167bd590d8fd2ab
-- name: github.com/BurntSushi/toml
-  version: b26d9c308763d68093482582cea63d69be07a0f0
+- name: github.com/armon/go-radix
+  version: 4239b77079c7b5d1243b7b4736304ce8ddb6f0f2
+- name: github.com/bgentry/speakeasy
+  version: 675b82c74c0ed12283ee81ba8a534c8982c07b85
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
 - name: github.com/franela/goreq
   version: b5b0f5eb2d16f20345cce0a544a75163579c0b00
+- name: github.com/jessevdk/go-flags
+  version: 48cf8722c3375517aba351d1f7577c40663a4407
 - name: github.com/jinzhu/configor
   version: b7df2005e02e9226447139012db968eda90a4b91
+- name: github.com/k0kubun/pp
+  version: 027a6d1765d673d337e687394dbe780dd64e2a1e
 - name: github.com/kelseyhightower/envconfig
   version: f611eb38b3875cc3bd991ca91c51d06446afa14c
+- name: github.com/mattn/go-isatty
+  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
+- name: github.com/mitchellh/cli
+  version: 8d6d9ab3c912dcb005ece87c40a41b9e73e1999a
 - name: github.com/tidwall/gjson
   version: 0623bd8fbdbf97cc62b98d15108832851a658e59
 - name: github.com/tidwall/match
   version: 173748da739a410c5b0b813b956f89ff94730b4c
-- name: gopkg.in/yaml.v1
-  version: 9f9df34309c04878acc86042b16630b0f696e1de
+- name: golang.org/x/sys
+  version: 99f16d856c9836c42d24e7ab64ea72916925fa97
+  subpackages:
+  - unix
 testImports: []

@@ -21,21 +21,21 @@ type AuthenticateRes struct {
 
 // Authenticate with username and password, then obtain session id.
 func Authenticate(aq *AuthenticateReq) (*AuthenticateRes, error) {
-	u, err := url.Parse(aq.HTTP.Url)
+	u, err := url.Parse(aq.Url)
 	if err != nil {
 		return nil, err
 	}
 
 	q := u.Query()
 	q.Set("action", "login")
-	q.Set("username", aq.Session.UserName)
-	q.Set("password", aq.Session.Password)
+	q.Set("username", aq.UserName)
+	q.Set("password", aq.Password)
 	u.RawQuery = q.Encode()
 
 	res, err := goreq.Request{
 		Method:   "POST",
 		Uri:      u.String(),
-		Insecure: aq.HTTP.Insecure,
+		Insecure: aq.Insecure,
 	}.Do()
 	if err != nil {
 		return nil, err
@@ -46,6 +46,11 @@ func Authenticate(aq *AuthenticateReq) (*AuthenticateRes, error) {
 		res.Body.Close()
 	}()
 	body, _ := res.Body.ToString()
+
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
 
 	// check error
 	// if "error" exists, that's an error

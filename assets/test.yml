@@ -1,0 +1,12 @@
+---
+url: "http://localhost:8081/"
+insecure: false
+username: azkaban
+password: azkaban
+projects:
+  - name: RecipeTest
+    description: "This is a recipe test project."
+    filepath: "./assets/test.zip"
+    flows:
+      - name: test
+        cron: "0 23/30 5,7-10 ? * 6#3"

@@ -18,7 +18,7 @@ func TestCreateProjectSuccess(t *testing.T) {
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 	conf := Config
-	conf.HTTP.Url = ts.URL
+	conf.Url = ts.URL
 
 	req := &CreateProjectReq{
 		Name:        "Test" + time.Now().Format("2006-01-02T15-04-05"),

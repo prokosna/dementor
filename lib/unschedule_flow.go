@@ -20,7 +20,7 @@ type UnscheduleFlowReq struct {
 
 // Unschedule a flow
 func UnscheduleFlow(sessionId string, req *UnscheduleFlowReq) error {
-	u, err := url.Parse(req.HTTP.Url)
+	u, err := url.Parse(req.Url)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func UnscheduleFlow(sessionId string, req *UnscheduleFlowReq) error {
 	res, err := goreq.Request{
 		Method:   "POST",
 		Uri:      u.String(),
-		Insecure: req.HTTP.Insecure,
+		Insecure: req.Insecure,
 	}.Do()
 	if err != nil {
 		return err
@@ -45,6 +45,11 @@ func UnscheduleFlow(sessionId string, req *UnscheduleFlowReq) error {
 		res.Body.Close()
 	}()
 	body, _ := res.Body.ToString()
+
+	// check status
+	if res.StatusCode < 200 || res.StatusCode > 399 {
+		return fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+	}
 
 	// check error
 	if status := gjson.Get(body, "status"); status.Str != "success" {
