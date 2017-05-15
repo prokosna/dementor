@@ -8,6 +8,7 @@ import (
 	"github.com/prokosna/dementor/lib"
 )
 
+// The successful series of processes
 func TestSuccessStory(t *testing.T) {
 	// authenticate
 	authenticateReq := &dementor.AuthenticateReq{

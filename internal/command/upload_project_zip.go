@@ -53,7 +53,7 @@ func (c *UploadProjectZipCommand) Run(args []string) int {
 		return 1
 	}
 
-	c.Ui.Output(fmt.Sprintf("Successfully upload the file: %s", res.ProjectId))
+	c.Ui.Info(fmt.Sprintf("Successfully uploaded the file [%s]", res.ProjectId))
 	return 0
 }
 

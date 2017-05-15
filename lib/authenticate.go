@@ -49,7 +49,7 @@ func Authenticate(aq *AuthenticateReq) (*AuthenticateRes, error) {
 
 	// check status
 	if res.StatusCode < 200 || res.StatusCode > 399 {
-		return nil, fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+		return nil, fmt.Errorf("ERROR: StatusCode is %d", res.StatusCode)
 	}
 
 	// check error

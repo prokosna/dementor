@@ -51,7 +51,7 @@ func (c *UnscheduleFlowCommand) Run(args []string) int {
 		return 1
 	}
 
-	c.Ui.Output(fmt.Sprintf("Successfully unscheduled the flow: %s", req.ScheduleId))
+	c.Ui.Info(fmt.Sprintf("Successfully unscheduled the flow [%s]", req.ScheduleId))
 	return 0
 }
 

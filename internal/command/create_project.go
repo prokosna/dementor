@@ -53,7 +53,7 @@ func (c *CreateProjectCommand) Run(args []string) int {
 		return 1
 	}
 
-	c.Ui.Output(fmt.Sprintf("Successfully created a project: %s", req.Name))
+	c.Ui.Info(fmt.Sprintf("Successfully created the project [%s]", req.Name))
 	return 0
 }
 

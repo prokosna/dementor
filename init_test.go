@@ -9,6 +9,7 @@ import (
 	"github.com/prokosna/dementor/lib"
 )
 
+// Integration test entry point
 func TestMain(m *testing.M) {
 	dementor.InitConf()
 	code := m.Run()

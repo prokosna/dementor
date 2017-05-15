@@ -51,7 +51,7 @@ func (c *DeleteProjectCommand) Run(args []string) int {
 		return 1
 	}
 
-	c.Ui.Output(fmt.Sprintf("Successfully deleted the project: %s", req.Project))
+	c.Ui.Info(fmt.Sprintf("Successfully deleted the project [%s]", req.Project))
 	return 0
 }
 

@@ -49,9 +49,9 @@ type Flow struct {
 }
 
 func (c *KissCommand) askWhetherContinue() {
-	a, err := c.Ui.Ask("Continue? [y/n]")
+	a, err := c.Ui.Ask("Continue? [y/n] >")
 	if strings.ToLower(a) != "y" || err != nil {
-		c.Ui.Error("Process is terminated")
+		c.Ui.Error("Terminated. Bye!")
 		os.Exit(1)
 	}
 }
@@ -65,10 +65,10 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 	fres, err := dementor.FetchFlowsProject(id, freq)
 	if err != nil {
 		// The project does not exist
-		c.Ui.Output(project.Name + " does not exist")
+		c.Ui.Output(fmt.Sprintf("The project [%s] does not exist.\n", project.Name))
 	} else {
 		// The project exists.
-		c.Ui.Output(project.Name + " exists. It will be removed first")
+		c.Ui.Warn(fmt.Sprintf("The project [%s] exists. First it will be removed...", project.Name))
 		c.askWhetherContinue()
 		// First, Unschedule all flows
 		for _, flow := range fres.Flows {
@@ -81,13 +81,13 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 			sres, err := dementor.FetchSchedule(id, sreq)
 			if err != nil {
 				c.Ui.Error(err.Error())
-				c.Ui.Error(fmt.Sprintf("Failed to fetch schedule of %s", sreq.FlowId))
+				c.Ui.Error(fmt.Sprintf("Failed to fetch the schedule of [%s].", sreq.FlowId))
 				c.askWhetherContinue()
 				continue
 			}
 			// Unschedule
 			if sres.ScheduleId != "" {
-				c.Ui.Output(fmt.Sprintf("Schedule of %s will be removed", flow.FlowId))
+				c.Ui.Warn(fmt.Sprintf("The schedule of [%s] will be removed...", flow.FlowId))
 				c.askWhetherContinue()
 				ureq := &dementor.UnscheduleFlowReq{
 					ScheduleId: sres.ScheduleId,
@@ -96,11 +96,11 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 				err = dementor.UnscheduleFlow(id, ureq)
 				if err != nil {
 					c.Ui.Error(err.Error())
-					c.Ui.Error(fmt.Sprintf("Failed to unschedule %s", flow.FlowId))
+					c.Ui.Error(fmt.Sprintf("Failed to unschedule [%s].", flow.FlowId))
 					c.askWhetherContinue()
 					continue
 				}
-				c.Ui.Output(fmt.Sprintf("Schedule of %s was removed", flow.FlowId))
+				c.Ui.Info(fmt.Sprintf("Schedule of [%s] was removed!", flow.FlowId))
 			}
 		}
 		// Second, delete the project
@@ -111,14 +111,14 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 		err = dementor.DeleteProject(id, dreq)
 		if err != nil {
 			c.Ui.Error(err.Error())
-			c.Ui.Error(fmt.Sprintf("Failed to delete the project %s", project.Name))
+			c.Ui.Error(fmt.Sprintf("Failed to remove the project [%s].", project.Name))
 			return err
 		}
-		c.Ui.Output(fmt.Sprintf("The project %s was deleted", project.Name))
+		c.Ui.Info(fmt.Sprintf("The project [%s] was removed!\n", project.Name))
 	}
 
 	// Create the project
-	c.Ui.Output(fmt.Sprintf("The project %s will be created", project.Name))
+	c.Ui.Output(fmt.Sprintf("The project [%s] will be created...", project.Name))
 	creq := &dementor.CreateProjectReq{
 		Name:        project.Name,
 		Description: project.Description,
@@ -127,13 +127,13 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 	_, err = dementor.CreateProject(id, creq)
 	if err != nil {
 		c.Ui.Error(err.Error())
-		c.Ui.Error(fmt.Sprintf("Failed to create the project %s", project.Name))
+		c.Ui.Error(fmt.Sprintf("Failed to create the project [%s].", project.Name))
 		return err
 	}
-	c.Ui.Output("Done")
+	c.Ui.Info("Done!\n")
 
 	// Upload a zip file
-	c.Ui.Output(fmt.Sprintf("The project zip file will be uploaded: %s", project.FilePath))
+	c.Ui.Output(fmt.Sprintf("The zip file [%s] will be uploaded...", project.FilePath))
 	ureq := &dementor.UploadProjectZipReq{
 		Project:    project.Name,
 		FilePath:   project.FilePath,
@@ -142,29 +142,29 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 	_, err = dementor.UploadProjectZip(id, ureq)
 	if err != nil {
 		c.Ui.Error(err.Error())
-		c.Ui.Error(fmt.Sprintf("Failed to upload the zip file %s", project.FilePath))
+		c.Ui.Error(fmt.Sprintf("Failed to upload the zip file [%s].", project.FilePath))
 		return err
 	}
-	c.Ui.Output("Done")
+	c.Ui.Info("Done!\n")
 
 	// Process flows
 	for _, flow := range project.Flows {
 		err = c.processFlow(id, commonConf, project.Name, flow)
 		if err != nil {
 			c.Ui.Error(err.Error())
-			c.Ui.Error(fmt.Sprintf("Failed to schedule the flow %s", flow.Name))
+			c.Ui.Error(fmt.Sprintf("Failed to schedule the flow [%s].", flow.Name))
 			c.askWhetherContinue()
 			continue
 		}
 	}
 
-	c.Ui.Output(fmt.Sprintf("Successfully processed the project %s", project.Name))
+	c.Ui.Info(fmt.Sprintf("The project [%s] was successfully processed!\n", project.Name))
 	return nil
 }
 
 func (c *KissCommand) processFlow(id string, commonConf dementor.CommonConf, project string, flow Flow) error {
 	// Schedule a flow
-	c.Ui.Output(fmt.Sprintf("The flow %s will be scheduled", flow.Name))
+	c.Ui.Output(fmt.Sprintf("The flow [%s] will be scheduled...", flow.Name))
 	sreq := &dementor.ScheduleFlowReq{
 		ProjectName:    project,
 		Flow:           flow.Name,
@@ -175,12 +175,12 @@ func (c *KissCommand) processFlow(id string, commonConf dementor.CommonConf, pro
 	if err != nil {
 		return err
 	}
-	c.Ui.Output("Done")
+	c.Ui.Info("Done!\n")
 	return nil
 }
 
 func (c *KissCommand) Run(args []string) int {
-	c.Ui.Output("Start to process the recipe")
+	c.Ui.Output("Start to process the recipe...\n")
 	_, err := kissParser.ParseArgs(args)
 	if err != nil {
 		c.Ui.Error(err.Error())
@@ -220,7 +220,7 @@ func (c *KissCommand) Run(args []string) int {
 		c.processProject(id, commonConf, project)
 	}
 
-	c.Ui.Output(fmt.Sprintf("Successfully processed the recipe file: %s", kissOpts.FilePath))
+	c.Ui.Info(fmt.Sprintf("Recipe file [%s] was successfully processed! Bye!", kissOpts.FilePath))
 	return 0
 }
 

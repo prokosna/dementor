@@ -38,7 +38,7 @@ func (c *AuthenticateCommand) Run(args []string) int {
 		return 1
 	}
 
-	c.Ui.Output(fmt.Sprintf("Session ID: %s", id))
+	c.Ui.Info(fmt.Sprintf("Session ID is [%s]", id))
 	return 0
 }
 

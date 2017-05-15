@@ -2,16 +2,20 @@
 
 ## Overview
 
-Dementor is the CLI tool of [Azkaban](https://github.com/azkaban/azkaban).
+Dementor is the CLI tool for [Azkaban](https://github.com/azkaban/azkaban).
 
-- Has Wrapper commands of official APIs
-- Supports a YAML recipe file for registering and scheduling projects/flows
+- Has wrapper commands of [official APIs](http://azkaban.github.io/azkaban/docs/latest/#ajax-api)
+- Supports a YAML recipe file for scheduling projects and flows
 
 ## Usage
 
 ### Basic wrapper commands
 
-Dementor has wrapper commands of official APIs such as __Create a Project__, __Delete a Project__... (Not all at the moment)
+Dementor has wrapper commands of official APIs such as __Create a Project__, __Delete a Project__... (not all APIs at the moment)
+
+You can see all commands with **--help** option.
+
+**Note**: You don't need to call **authenticate** command to fetch a session ID. It is called internally in each command.
 
 ```
 $ dementor --help
@@ -33,9 +37,15 @@ Available commands are:
 
 ### Kiss command (processing a recipe written in YAML)
 
-Dementor has the kiss command which process a recipe written in YAML.
+You can write a recipe which defines projects, flows, and schedules in YAML file.
 
-A recipe looks like below:
+Dementor has the kiss command for processing it.
+
+```
+$ dementor kiss -f path_to_recipe_file.yml
+```
+
+A recipe file looks as below:
 
 ```
 url: "http://localhost:8081/"
@@ -50,6 +60,10 @@ projects:
       - name: test
         cron: "0 23/30 5,7-10 ? * 6#3"
 ```
+
+**Note**: **cron** must be a [Quartz Cron Format](http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html).
+
+If the same project is already registered, Dementor removes it first and then processes a recipe. In other words, **kiss** command has idempotency.
 
 ## License
 

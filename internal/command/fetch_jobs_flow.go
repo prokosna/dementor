@@ -55,7 +55,7 @@ func (c *FetchJobsCommand) Run(args []string) int {
 	}
 
 	pretty := pp.Sprint(*res)
-	c.Ui.Output(fmt.Sprintf("Successfully fetched the jobs: \n%s", pretty))
+	c.Ui.Info(fmt.Sprintf("Successfully fetched the jobs: \n%s", pretty))
 	return 0
 }
 

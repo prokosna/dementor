@@ -13,6 +13,7 @@ type CommonConf struct {
 
 var Config CommonConf
 
+// Initialize CommonConf mainly for tests
 func InitConf() error {
 	return envconfig.Process("DEM", &Config)
 }

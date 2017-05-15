@@ -55,7 +55,7 @@ func (c *ScheduleFlowCommand) Run(args []string) int {
 		return 1
 	}
 
-	c.Ui.Output(fmt.Sprintf("Successfully scheduled the flow: %s", res.ScheduleId))
+	c.Ui.Info(fmt.Sprintf("Successfully scheduled the flow [%s]", res.ScheduleId))
 	return 0
 }
 

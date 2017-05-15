@@ -53,7 +53,7 @@ func (c *FetchFlowsCommand) Run(args []string) int {
 	}
 
 	pretty := pp.Sprint(*res)
-	c.Ui.Output(fmt.Sprintf("Successfully fetched the flows: \n%s", pretty))
+	c.Ui.Info(fmt.Sprintf("Successfully fetched the flows: \n%s", pretty))
 	return 0
 }
 

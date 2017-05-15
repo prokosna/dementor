@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// Logging in and fetch a session ID
 func TestLoginSuccess(t *testing.T) {
 	var handler = http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.Header().Set("Content-Type", "application/json")

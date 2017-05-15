@@ -28,6 +28,8 @@ func main() {
 	cui := &cli.ColoredUi{
 		Ui:          ui,
 		OutputColor: cli.UiColorGreen,
+		InfoColor:   cli.UiColorCyan,
+		WarnColor:   cli.UiColorYellow,
 		ErrorColor:  cli.UiColorRed,
 	}
 	c := cli.NewCLI("dementor", "0.0.1")

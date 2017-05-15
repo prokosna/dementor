@@ -48,7 +48,7 @@ func UnscheduleFlow(sessionId string, req *UnscheduleFlowReq) error {
 
 	// check status
 	if res.StatusCode < 200 || res.StatusCode > 399 {
-		return fmt.Errorf("ERROR: StatusCode is not 2xx: %d", res.StatusCode)
+		return fmt.Errorf("ERROR: StatusCode is %d", res.StatusCode)
 	}
 
 	// check error
