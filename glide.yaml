@@ -1,7 +1,0 @@
-package: github.com/prokosna/dementor
-import:
-- package: github.com/franela/goreq
-- package: github.com/tidwall/gjson
-- package: github.com/kelseyhightower/envconfig
-- package: github.com/jessevdk/go-flags
-- package: github.com/k0kubun/pp

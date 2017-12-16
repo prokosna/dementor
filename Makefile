@@ -7,7 +7,7 @@ LDFLAGS := -X 'main.version=$(VERSION)' \
 
 ## Setup
 setup:
-	go get github.com/Masterminds/glide
+	go get github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/laher/goxc
@@ -15,27 +15,25 @@ setup:
 
 ## Install dependencies
 deps: setup
-	glide install
+	dep ensure
 
 ## Update dependencies
 update: setup
-	glide update
+	dep ensure -update
 
 ## Format source codes
 fmt: setup
-	goimports -w $$(glide nv -x)
+	goimports -w $$(find . -type f -name "*.go" -not -path "./vendor/*")
 
 ## Test
 test: deps fmt
-	go test -v $$(glide novendor) -tags=unit
-	go test -v $$(glide novendor) -tags=integration
+	go test -v ./... -tags=unit
+	go test -v ./... -tags=integration
 
 ## Lint
 lint: setup fmt
-	go vet $$(glide novendor)
-	for pkg in $$(glide novendor -x); do \
-		golint -set_exit_status $$pkg || exit $$?; \
-	done
+	go vet ./...
+	golint $$(find . -type f -name "*.go" -not -path "./vendor/*")
 
 ## Run
 run: deps fmt
