@@ -26,16 +26,16 @@ func Authenticate(aq *AuthenticateReq) (*AuthenticateRes, error) {
 		return nil, err
 	}
 
-	q := u.Query()
-	q.Set("action", "login")
-	q.Set("username", aq.UserName)
-	q.Set("password", aq.Password)
-	u.RawQuery = q.Encode()
+	values := url.Values{}
+	values.Add("action", "login")
+	values.Add("username", aq.UserName)
+	values.Add("password", aq.Password)
 
 	res, err := goreq.Request{
-		Method:   "POST",
-		Uri:      u.String(),
-		Insecure: aq.Insecure,
+		Method:      "POST",
+		Uri:         u.String(),
+		Body:        values.Encode(),
+		ContentType: "application/x-www-form-urlencoded",
 	}.Do()
 	if err != nil {
 		return nil, err

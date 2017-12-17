@@ -10,7 +10,6 @@ setup:
 	go get github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
-	go get github.com/laher/goxc
 	go get github.com/Songmu/make2help/cmd/make2help
 
 ## Install dependencies
@@ -39,12 +38,30 @@ lint: setup fmt
 run: deps fmt
 	go run *.go
 
-## Build binaries
 build: deps fmt
-	goxc -tasks=xc,archive -d=./bin -bc="linux,windows,darwin" -pv=$(VERSION)
+	go build
+
+## Build binaries
+cross-build: deps fmt
+	for os in darwin linux windows; do \
+		for arch in amd64 386; do \
+			env GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo -installsuffix netgo -o dist/$$os-$$arch/$(NAME); \
+		done; \
+	done
+
+dist: cross-build
+	cd dist && \
+	find * -type d -exec cp ../LICENSE {} \; && \
+	find * -type d -exec cp ../README.md {} \; && \
+	find * -type d -exec tar -zcvf $(NAME)-$(VERSION)-{}.tar.gz {} \; && \
+	cd ..
+
+clean:
+	rm -rf dist/*
+	rm -rf vendor/*
 
 ## Show help
 help:
 	@make2help $(MAKEFILE_LIST)
 
-.PHONY: setup deps update test lint run help build
+.PHONY: setup deps update test lint run help build cross-build dist clean

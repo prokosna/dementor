@@ -32,9 +32,8 @@ func DeleteProject(sessionId string, dq *DeleteProjectReq) error {
 	u.RawQuery = q.Encode()
 
 	res, err := goreq.Request{
-		Method:   "GET",
-		Uri:      u.String(),
-		Insecure: dq.Insecure,
+		Method: "GET",
+		Uri:    u.String(),
 	}.Do()
 	if err != nil {
 		return err

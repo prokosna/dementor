@@ -49,7 +49,6 @@ A recipe file looks as below:
 
 ```
 url: "http://localhost:8081/"
-insecure: false
 username: azkaban
 password: azkaban
 projects:

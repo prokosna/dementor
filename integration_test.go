@@ -138,6 +138,7 @@ func TestSuccessStory(t *testing.T) {
 	if err == nil {
 		t.Fatal("The schedule is not unscheduled")
 	}
+	t.Log("Unscheduled")
 
 	// Delete the project
 	deleteProjectReq := &dementor.DeleteProjectReq{
@@ -151,4 +152,5 @@ func TestSuccessStory(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Log("The test project was deleted")
 }

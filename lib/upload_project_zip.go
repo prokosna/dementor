@@ -86,7 +86,6 @@ func UploadProjectZip(sessionId string, uq *UploadProjectZipReq) (*UploadProject
 		Uri:         u.String(),
 		Body:        &b,
 		ContentType: w.FormDataContentType(),
-		Insecure:    uq.Insecure,
 	}.Do()
 	if err != nil {
 		return nil, err

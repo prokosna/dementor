@@ -1,6 +1,5 @@
 ---
-url: "http://localhost:8081/"
-insecure: false
+url: "http://risa:8081/"
 username: azkaban
 password: azkaban
 projects:

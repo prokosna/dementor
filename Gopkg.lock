@@ -2,25 +2,40 @@
 
 
 [[projects]]
+  branch = "master"
   name = "github.com/armon/go-radix"
   packages = ["."]
-  revision = "4239b77079c7b5d1243b7b4736304ce8ddb6f0f2"
+  revision = "1fca145dffbcaa8fe914309b1ec0cfc67500fe61"
 
 [[projects]]
   name = "github.com/bgentry/speakeasy"
   packages = ["."]
-  revision = "675b82c74c0ed12283ee81ba8a534c8982c07b85"
+  revision = "4aabc24848ce5fd31929f7d1e4ea74d3709c14cd"
+  version = "v0.1.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/franela/goreq"
   packages = ["."]
-  revision = "b5b0f5eb2d16f20345cce0a544a75163579c0b00"
+  revision = "bcd34c9993f899273c74baaa95e15386cd97b6e7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/errwrap"
+  packages = ["."]
+  revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-multierror"
+  packages = ["."]
+  revision = "b7773ae218740a7be65057fc60b366a49b538a44"
 
 [[projects]]
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
-  revision = "48cf8722c3375517aba351d1f7577c40663a4407"
-  version = "v1.2.0"
+  revision = "96dc06278ce32a0e9d957d590bb987c81ee66407"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/k0kubun/pp"
@@ -37,37 +52,50 @@
 [[projects]]
   name = "github.com/mattn/go-colorable"
   packages = ["."]
-  revision = "ded68f7a9561c023e790de24279db7ebf473ea80"
+  revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
+  version = "v0.0.9"
 
 [[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
-  revision = "57fdcb988a5c543893cc61bce354a6e24ab70022"
+  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
+  version = "v0.0.3"
 
 [[projects]]
+  branch = "master"
   name = "github.com/mitchellh/cli"
   packages = ["."]
-  revision = "8d6d9ab3c912dcb005ece87c40a41b9e73e1999a"
+  revision = "33edc47170b5df54d2588696d590c5e20ee583fe"
+
+[[projects]]
+  name = "github.com/posener/complete"
+  packages = [".","cmd","cmd/install","match"]
+  revision = "dc2bc5a81accba8782bebea28628224643a8286a"
+  version = "v1.1"
 
 [[projects]]
   name = "github.com/tidwall/gjson"
   packages = ["."]
-  revision = "0623bd8fbdbf97cc62b98d15108832851a658e59"
+  revision = "080cd2281672e2db949148e6f07cc2e9630fb480"
+  version = "v1.0.4"
 
 [[projects]]
+  branch = "master"
   name = "github.com/tidwall/match"
   packages = ["."]
-  revision = "173748da739a410c5b0b813b956f89ff94730b4c"
+  revision = "1731857f09b1f38450e2c12409748407822dc6be"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "99f16d856c9836c42d24e7ab64ea72916925fa97"
+  revision = "571f7bbbe08da2a8955aed9d4db316e78630e9a3"
 
 [[projects]]
+  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
+  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
 
 [solve-meta]
   analyzer-name = "dep"

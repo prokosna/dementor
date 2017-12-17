@@ -33,9 +33,8 @@ func UnscheduleFlow(sessionId string, req *UnscheduleFlowReq) error {
 	u.RawQuery = q.Encode()
 
 	res, err := goreq.Request{
-		Method:   "POST",
-		Uri:      u.String(),
-		Insecure: req.Insecure,
+		Method: "POST",
+		Uri:    u.String(),
 	}.Do()
 	if err != nil {
 		return err

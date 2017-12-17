@@ -30,7 +30,6 @@ func init() {
 
 type Recipe struct {
 	Url      string    `yaml:"url"`
-	Insecure bool      `yaml:"insecure"`
 	Username string    `yaml:"username"`
 	Password string    `yaml:"password"`
 	Projects []Project `yaml:"projects"`
@@ -56,6 +55,18 @@ func (c *KissCommand) askWhetherContinue() {
 	}
 }
 
+func (c *KissCommand) createProject(id string, commonConf dementor.CommonConf, project Project) error {
+	// Create the project
+	c.Ui.Output(fmt.Sprintf("The project [%s] will be created...", project.Name))
+	creq := &dementor.CreateProjectReq{
+		Name:        project.Name,
+		Description: project.Description,
+		CommonConf:  commonConf,
+	}
+	_, err := dementor.CreateProject(id, creq)
+	return err
+}
+
 func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, project Project) error {
 	// Fetch flows
 	freq := &dementor.FetchFlowsProjectReq{
@@ -66,71 +77,85 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 	if err != nil {
 		// The project does not exist
 		c.Ui.Output(fmt.Sprintf("The project [%s] does not exist.\n", project.Name))
+
+		// Create the project
+		err = c.createProject(id, commonConf, project)
+		if err != nil {
+			c.Ui.Error(err.Error())
+			c.Ui.Error(fmt.Sprintf("Failed to create the project [%s].", project.Name))
+			return err
+		}
+		c.Ui.Info("Done!\n")
 	} else {
 		// The project exists.
-		c.Ui.Warn(fmt.Sprintf("The project [%s] exists. First it will be removed...", project.Name))
-		c.askWhetherContinue()
-		// First, Unschedule all flows
-		for _, flow := range fres.Flows {
-			// Fetch a schedule
-			sreq := &dementor.FetchScheduleReq{
-				ProjectId:  fres.ProjectId,
-				FlowId:     flow.FlowId,
-				CommonConf: commonConf,
-			}
-			sres, err := dementor.FetchSchedule(id, sreq)
-			if err != nil {
-				c.Ui.Error(err.Error())
-				c.Ui.Error(fmt.Sprintf("Failed to fetch the schedule of [%s].", sreq.FlowId))
-				c.askWhetherContinue()
-				continue
-			}
-			// Unschedule
-			if sres.ScheduleId != "" {
-				c.Ui.Warn(fmt.Sprintf("The schedule of [%s] will be removed...", flow.FlowId))
-				c.askWhetherContinue()
-				ureq := &dementor.UnscheduleFlowReq{
-					ScheduleId: sres.ScheduleId,
+		a, err := c.Ui.Ask("The project [%s] exists. Replace(r) or Update(u)? [r/u] >")
+		if (strings.ToLower(a) == "r" || strings.ToLower(a) == "u") && err == nil {
+			// First, Unschedule all flows
+			for _, flow := range fres.Flows {
+				// Fetch a schedule
+				sreq := &dementor.FetchScheduleReq{
+					ProjectId:  fres.ProjectId,
+					FlowId:     flow.FlowId,
 					CommonConf: commonConf,
 				}
-				err = dementor.UnscheduleFlow(id, ureq)
+				sres, err := dementor.FetchSchedule(id, sreq)
 				if err != nil {
 					c.Ui.Error(err.Error())
-					c.Ui.Error(fmt.Sprintf("Failed to unschedule [%s].", flow.FlowId))
+					c.Ui.Error(fmt.Sprintf("Failed to fetch the schedule of [%s].", sreq.FlowId))
 					c.askWhetherContinue()
 					continue
 				}
-				c.Ui.Info(fmt.Sprintf("Schedule of [%s] was removed!", flow.FlowId))
+				// Unschedule
+				if sres.ScheduleId != "" {
+					c.Ui.Warn(fmt.Sprintf("The schedule of [%s] will be removed...", flow.FlowId))
+					c.askWhetherContinue()
+					ureq := &dementor.UnscheduleFlowReq{
+						ScheduleId: sres.ScheduleId,
+						CommonConf: commonConf,
+					}
+					err = dementor.UnscheduleFlow(id, ureq)
+					if err != nil {
+						c.Ui.Error(err.Error())
+						c.Ui.Error(fmt.Sprintf("Failed to unschedule [%s].", flow.FlowId))
+						c.askWhetherContinue()
+						continue
+					}
+					c.Ui.Info(fmt.Sprintf("Schedule of [%s] was removed!", flow.FlowId))
+				}
+			}
+
+			if strings.ToLower(a) == "r" {
+				// If Replace, delete the project and create
+				dreq := &dementor.DeleteProjectReq{
+					Project:    project.Name,
+					CommonConf: commonConf,
+				}
+				err = dementor.DeleteProject(id, dreq)
+				if err != nil {
+					c.Ui.Error(err.Error())
+					c.Ui.Error(fmt.Sprintf("Failed to remove the project [%s].", project.Name))
+					return err
+				}
+				c.Ui.Info(fmt.Sprintf("The project [%s] was removed!\n", project.Name))
+
+				// Create the project
+				err = c.createProject(id, commonConf, project)
+				if err != nil {
+					c.Ui.Error(err.Error())
+					c.Ui.Error(fmt.Sprintf("Failed to create the project [%s].", project.Name))
+					return err
+				}
+				c.Ui.Info("Done!\n")
+			}
+		} else {
+			c.Ui.Error("Terminated. Bye!")
+			if err == nil {
+				os.Exit(0)
+			} else {
+				os.Exit(1)
 			}
 		}
-		// Second, delete the project
-		dreq := &dementor.DeleteProjectReq{
-			Project:    project.Name,
-			CommonConf: commonConf,
-		}
-		err = dementor.DeleteProject(id, dreq)
-		if err != nil {
-			c.Ui.Error(err.Error())
-			c.Ui.Error(fmt.Sprintf("Failed to remove the project [%s].", project.Name))
-			return err
-		}
-		c.Ui.Info(fmt.Sprintf("The project [%s] was removed!\n", project.Name))
 	}
-
-	// Create the project
-	c.Ui.Output(fmt.Sprintf("The project [%s] will be created...", project.Name))
-	creq := &dementor.CreateProjectReq{
-		Name:        project.Name,
-		Description: project.Description,
-		CommonConf:  commonConf,
-	}
-	_, err = dementor.CreateProject(id, creq)
-	if err != nil {
-		c.Ui.Error(err.Error())
-		c.Ui.Error(fmt.Sprintf("Failed to create the project [%s].", project.Name))
-		return err
-	}
-	c.Ui.Info("Done!\n")
 
 	// Upload a zip file
 	c.Ui.Output(fmt.Sprintf("The zip file [%s] will be uploaded...", project.FilePath))
@@ -203,7 +228,6 @@ func (c *KissCommand) Run(args []string) int {
 
 	commonConf := dementor.CommonConf{
 		Url:      recipe.Url,
-		Insecure: recipe.Insecure,
 		UserName: recipe.Username,
 		Password: recipe.Password,
 	}

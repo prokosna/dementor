@@ -40,9 +40,8 @@ func ScheduleFlow(sessionId string, sq *ScheduleFlowReq) (*ScheduleFlowRes, erro
 	u.RawQuery = q.Encode()
 
 	res, err := goreq.Request{
-		Method:   "POST",
-		Uri:      u.String(),
-		Insecure: sq.Insecure,
+		Method: "POST",
+		Uri:    u.String(),
 	}.Do()
 	if err != nil {
 		return nil, err

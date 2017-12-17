@@ -31,17 +31,21 @@ func CreateProject(sessionId string, cq *CreateProjectReq) (*CreateProjectRes, e
 	}
 
 	q := u.Query()
-	q.Set("session.id", sessionId)
 	q.Set("action", "create")
-	q.Set("name", cq.Name)
-	q.Set("description", cq.Description)
+
 	u.Path = strings.Trim(u.Path, "/") + "/manager"
 	u.RawQuery = q.Encode()
 
+	values := url.Values{}
+	values.Add("session.id", sessionId)
+	values.Add("name", cq.Name)
+	values.Add("description", cq.Description)
+
 	res, err := goreq.Request{
-		Method:   "POST",
-		Uri:      u.String(),
-		Insecure: cq.Insecure,
+		Method:      "POST",
+		Uri:         u.String(),
+		Body:        values.Encode(),
+		ContentType: "application/x-www-form-urlencoded",
 	}.Do()
 	if err != nil {
 		return nil, err

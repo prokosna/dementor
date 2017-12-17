@@ -40,9 +40,8 @@ func FetchFlowsProject(sessionId string, fq *FetchFlowsProjectReq) (*FetchFlowsP
 	u.RawQuery = q.Encode()
 
 	res, err := goreq.Request{
-		Method:   "GET",
-		Uri:      u.String(),
-		Insecure: fq.Insecure,
+		Method: "GET",
+		Uri:    u.String(),
 	}.Do()
 	if err != nil {
 		return nil, err
