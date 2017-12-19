@@ -71,7 +71,9 @@ func CreateProject(sessionId string, cq *CreateProjectReq) (*CreateProjectRes, e
 	var cs CreateProjectRes
 	err = gjson.Unmarshal([]byte(body), &cs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(
+			"ERROR: Invalid create_project response\nResp -> %s",
+			body)
 	}
 	if cs.Status != "success" {
 		return nil, fmt.Errorf("ERROR: Response status is not success: %+v", cs)

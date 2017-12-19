@@ -66,7 +66,9 @@ func FetchFlowsProject(sessionId string, fq *FetchFlowsProjectReq) (*FetchFlowsP
 	var fs FetchFlowsProjectRes
 	err = gjson.Unmarshal([]byte(body), &fs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(
+			"ERROR: Invalid fetch_flows_project response\nResp -> %s",
+			body)
 	}
 
 	return &fs, nil

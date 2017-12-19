@@ -105,7 +105,7 @@ func UploadProjectZip(sessionId string, uq *UploadProjectZipReq) (*UploadProject
 	var us UploadProjectZipRes
 	err = gjson.Unmarshal([]byte(body), &us)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ERROR: Invalid upload_project_zip response\nResp -> %s", body)
 	}
 	if us.Error != "" {
 		return nil, fmt.Errorf("ERROR: %+v", us)

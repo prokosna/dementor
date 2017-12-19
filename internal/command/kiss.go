@@ -68,6 +68,7 @@ func (c *KissCommand) createProject(id string, commonConf dementor.CommonConf, p
 }
 
 func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, project Project) error {
+	errorCount := 0
 	// Fetch flows
 	freq := &dementor.FetchFlowsProjectReq{
 		Project:    project.Name,
@@ -88,7 +89,7 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 		c.Ui.Info("Done!\n")
 	} else {
 		// The project exists.
-		a, err := c.Ui.Ask("The project [%s] exists. Replace(r) or Update(u)? [r/u] >")
+		a, err := c.Ui.Ask(fmt.Sprintf("The project [%s] exists. Replace(r) or Update(u)? [r/u] >", project.Name))
 		if (strings.ToLower(a) == "r" || strings.ToLower(a) == "u") && err == nil {
 			// First, Unschedule all flows
 			for _, flow := range fres.Flows {
@@ -103,12 +104,12 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 					c.Ui.Error(err.Error())
 					c.Ui.Error(fmt.Sprintf("Failed to fetch the schedule of [%s].", sreq.FlowId))
 					c.askWhetherContinue()
+					errorCount += 1
 					continue
 				}
 				// Unschedule
-				if sres.ScheduleId != "" {
+				if sres != nil && sres.ScheduleId != "" {
 					c.Ui.Warn(fmt.Sprintf("The schedule of [%s] will be removed...", flow.FlowId))
-					c.askWhetherContinue()
 					ureq := &dementor.UnscheduleFlowReq{
 						ScheduleId: sres.ScheduleId,
 						CommonConf: commonConf,
@@ -118,6 +119,7 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 						c.Ui.Error(err.Error())
 						c.Ui.Error(fmt.Sprintf("Failed to unschedule [%s].", flow.FlowId))
 						c.askWhetherContinue()
+						errorCount += 1
 						continue
 					}
 					c.Ui.Info(fmt.Sprintf("Schedule of [%s] was removed!", flow.FlowId))
@@ -178,12 +180,18 @@ func (c *KissCommand) processProject(id string, commonConf dementor.CommonConf, 
 		if err != nil {
 			c.Ui.Error(err.Error())
 			c.Ui.Error(fmt.Sprintf("Failed to schedule the flow [%s].", flow.Name))
+			c.Ui.Info("HINT: Please try replace instead of update.")
 			c.askWhetherContinue()
+			errorCount += 1
 			continue
 		}
 	}
 
-	c.Ui.Info(fmt.Sprintf("The project [%s] was successfully processed!\n", project.Name))
+	if errorCount > 0 {
+		c.Ui.Warn(fmt.Sprintf("The project [%s] was processed with %d errors.\n", project.Name, errorCount))
+	} else {
+		c.Ui.Info(fmt.Sprintf("The project [%s] was successfully processed!\n", project.Name))
+	}
 	return nil
 }
 
@@ -244,7 +252,7 @@ func (c *KissCommand) Run(args []string) int {
 		c.processProject(id, commonConf, project)
 	}
 
-	c.Ui.Info(fmt.Sprintf("Recipe file [%s] was successfully processed! Bye!", kissOpts.FilePath))
+	c.Ui.Info(fmt.Sprintf("This is the end of the recipe file [%s]. Bye!", kissOpts.FilePath))
 	return 0
 }
 

@@ -71,7 +71,7 @@ func FetchJobsFlow(sessionId string, fq *FetchJobsFlowReq) (*FetchJobsFlowRes, e
 	var fs FetchJobsFlowRes
 	err = gjson.Unmarshal([]byte(body), &fs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ERROR: Invalid fetch_jobs_flow resonse\nResp -> %s", body)
 	}
 
 	return &fs, nil

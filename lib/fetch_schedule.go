@@ -63,18 +63,20 @@ func FetchSchedule(sessionId string, fq *FetchScheduleReq) (*FetchScheduleRes, e
 	}
 
 	// check empty
-	v := gjson.Parse(body)
+	v := gjson.Parse(body).Get("schedule")
 	if !v.Exists() {
-		return nil, fmt.Errorf("ERROR: Project or flow does not exist\nProjectId -> %s\nFlowId -> %s",
-			fq.ProjectId,
-			fq.FlowId)
+		return nil, nil
 	}
 
 	// parse body
 	var fs FetchScheduleRes
 	err = gjson.Unmarshal([]byte(gjson.Get(body, "schedule").Raw), &fs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(
+			"ERROR: Invalid fetch_schedule response\nProjectId -> %s\nFlowId -> %s\nResp -> %s",
+			fq.ProjectId,
+			fq.FlowId,
+			body)
 	}
 
 	return &fs, nil
